@@ -1,0 +1,23 @@
+{
+  "name": "upload-image",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/472647301/upload-image.git"
+  },
+  "author": "Byron <472647301@qq.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/472647301/upload-image/issues"
+  },
+  "homepage": "https://github.com/472647301/upload-image#readme",
+  "dependencies": {
+    "koa": "^2.5.2",
+    "puppeteer": "^1.7.0"
+  }
+}
