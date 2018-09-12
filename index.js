@@ -6,12 +6,15 @@ const axios = require('axios')
 class FetchData {
   constructor() {
     this.timer = null
+    this.params = {}
   }
   init(params, callback) {
     this.timer = setInterval(() => {
-      axios.get(`http://www.coinlim.com/service-business-tradingview/v0.1.0/history?symbol=${params.symbol}&resolution=${params.resolution}&from=${params.from}&to=${params.to}`).then(res => {
-        callback && callback(res.data)
-      })
+      if (this.params.from !== params.from && this.params.to !== params.to) {
+        axios.get(`http://www.coinlim.com/service-business-tradingview/v0.1.0/history?symbol=${params.symbol}&resolution=${params.resolution}&from=${params.from}&to=${params.to}`).then(res => {
+          callback && callback(res.data)
+        })
+      }
     }, 1000)
   }
   close() {
