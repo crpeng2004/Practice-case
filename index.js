@@ -11,6 +11,7 @@ class FetchData {
   init(params, callback) {
     this.timer = setInterval(() => {
       if (this.params.from !== params.from && this.params.to !== params.to) {
+        this.params = params
         axios.get(`http://www.coinlim.com/service-business-tradingview/v0.1.0/history?symbol=${params.symbol}&resolution=${params.resolution}&from=${params.from}&to=${params.to}`).then(res => {
           callback && callback(res.data)
         })
