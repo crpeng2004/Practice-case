@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/472647301/upload-image#readme",
   "dependencies": {
+    "axios": "^0.18.0",
     "koa": "^2.5.2",
-    "puppeteer": "^1.7.0"
+    "koa-websocket": "^5.0.1"
   }
 }
