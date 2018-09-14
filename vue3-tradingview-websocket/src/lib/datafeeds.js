@@ -81,21 +81,30 @@ export class DataUpdater {
 export class Datafeeds {
   // ws://localhost:666/trader || ws://118.190.201.181:666/trader
   constructor(options, url = 'ws://118.190.201.181:666/trader') {
+    this.url = url
     this.options = options || {}
     this.HistoricalData = null  // 历史数据
     this.PushData = null // 推送数据
     this.awaitCount = 0  // 等待统计
     this.lastTime = 0
     this.barsUpdater = new DataUpdater(this)
-    this.socket = new SocketIo(url)
+    this.initSocket()
+  }
+
+  initSocket(params) {
+    const data = params ? params : this.options
+    const { symbol, resolution } = data
+    this.socket = new SocketIo(this.url)
     this.socket.init()
-    this.socket.on('open', () => {
-      this.socket.emit({
-        symbol: this.options.symbol,
-        resolution: this.options.resolution
-      })
-    })
+    this.socket.on('open', () => this.socket.emit({ symbol, resolution }))
     this.socket.on('message', this.onMessage.bind(this))
+  }
+
+  closeSocket() {
+    this.socket.close()
+    this.awaitCount = 0
+    this.HistoricalData = null
+    this.PushData = null
   }
 
   onMessage(data) {
@@ -184,9 +193,24 @@ export class Datafeeds {
    * @param {*Function} onErrorCallback  回调函数
    */
   getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate, onDataCallback, onErrorCallback) {
+    // 切换周期
+    if (resolution !== this.options.resolution) {
+      console.log(' >> Change resolution: ', this.options.resolution, resolution)
+      this.closeSocket()
+      this.options.resolution = resolution
+      this.initSocket({ symbol: this.options.symbol, resolution: resolution })
+    }
+    /// 切换商品
+    if (symbolInfo.name.toLocaleUpperCase() !== this.options.symbol.toLocaleUpperCase()) {
+      console.log(' >> Change symbol: ', this.options.symbol, symbolInfo.name)
+      this.closeSocket()
+      this.options.symbol = symbolInfo.name
+      this.initSocket({ symbol: symbolInfo.name, resolution: this.options.resolution })
+    }
     if (!this.awaitCount && !this.HistoricalData) {
+      // 历史数据
       this.asyncCallback().then(data => {
-        console.log(' >> Historical data: ', rangeStartDate, rangeEndDate)
+        // console.log(' >> Historical data: ', rangeStartDate, rangeEndDate)
         this.awaitCount = 0
         const bars = []
         if (data.length) {
@@ -204,6 +228,7 @@ export class Datafeeds {
         onDataCallback(bars, { noData: true })
       })
     } else {
+      // 实时数据
       onDataCallback(this.PushData, { noData: true })
     }
   }

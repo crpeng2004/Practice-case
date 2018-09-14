@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import { Datafeeds } from '../lib/datafees'
+import { Datafeeds } from '../lib/datafeeds'
 export default {
   data() {
     return {
@@ -31,7 +31,7 @@ export default {
     }
   },
   mounted() {
-    this.initChart('zh', 'ETH/USDT', '1')
+    this.initChart('zh', 'ETH/USDT', '15')
   }
 }
 </script>
