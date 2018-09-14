@@ -296,6 +296,8 @@ export class Datafeeds {
       'pointvalue': 1,
       'fractional': false,
       'session': '24x7',
+      'minmov': 1,
+      'minmove2': 1,
       'has_intraday': true,
       'has_no_volume': false,
       'description': this.options.symbol,
