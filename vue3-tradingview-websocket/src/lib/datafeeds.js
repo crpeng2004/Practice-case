@@ -1,3 +1,4 @@
+import axios from 'axios'
 /* eslint-disable */
 /**
  * 数据更新器
@@ -80,7 +81,7 @@ export class DataUpdater {
  */
 export class Datafeeds {
   // ws://localhost:666/trader || ws://118.190.201.181:666/trader
-  constructor(options, url = 'ws://118.190.201.181:666/trader') {
+  constructor(options, url = 'ws://127.0.0.1:666/trader') {
     this.url = url
     this.options = options || {}
     this.HistoricalData = null  // 历史数据
@@ -134,10 +135,17 @@ export class Datafeeds {
    * `onReady` should return result asynchronously.
    */
   onReady(callback) {
-    return new Promise(resolve => {
-      const defaultConfiguration = this.defaultConfiguration()
-      resolve(defaultConfiguration)
-    }).then(data => callback(data))
+    // return new Promise(resolve => {
+    //   const defaultConfiguration = this.defaultConfiguration()
+    //   resolve(defaultConfiguration)
+    // }).then(data => callback(data))
+    axios.get('http://www.coinlim.com/service-business-tradingview/v0.1.0/config').then(res => {
+      if (res.data) {
+        callback(res.data)
+      } else {
+        callback(this.defaultSymbol())
+      }
+    })
   }
 
   /**
@@ -147,10 +155,17 @@ export class Datafeeds {
    * `resolveSymbol` should return result asynchronously.
    */
   resolveSymbol(symbolName, onSymbolResolvedCallback, onResolveErrorCallback) {
-    return new Promise(resolve => {
-      const symbolInfo = this.defaultSymbol()
-      resolve(symbolInfo)
-    }).then(data => onSymbolResolvedCallback(data))
+    // return new Promise(resolve => {
+    //   const symbolInfo = this.defaultSymbol()
+    //   resolve(symbolInfo)
+    // }).then(data => onSymbolResolvedCallback(data))
+    axios.get(`http://www.coinlim.com/service-business-tradingview/v0.1.0/symbols?symbol=${this.options.symbol}`).then(res => {
+      if (res.data) {
+        onSymbolResolvedCallback(res.data)
+      } else {
+        onSymbolResolvedCallback(this.defaultSymbol())
+      }
+    })
   }
 
   /**
@@ -200,13 +215,6 @@ export class Datafeeds {
       this.options.resolution = resolution
       this.initSocket({ symbol: this.options.symbol, resolution: resolution })
     }
-    /// 切换商品
-    if (symbolInfo.name.toLocaleUpperCase() !== this.options.symbol.toLocaleUpperCase()) {
-      console.log(' >> Change symbol: ', this.options.symbol, symbolInfo.name)
-      this.closeSocket()
-      this.options.symbol = symbolInfo.name
-      this.initSocket({ symbol: symbolInfo.name, resolution: this.options.resolution })
-    }
     if (!this.awaitCount && !this.HistoricalData) {
       // 历史数据
       this.asyncCallback().then(data => {
@@ -225,11 +233,11 @@ export class Datafeeds {
           this.HistoricalData = bars
           this.lastTime = bars[bars.length - 1].time
         }
-        onDataCallback(bars, { noData: true })
+        onDataCallback(bars, { noData: false })
       })
     } else {
       // 实时数据
-      onDataCallback(this.PushData, { noData: true })
+      onDataCallback(this.PushData ? this.PushData : [], { noData: true })
     }
   }
 
@@ -293,16 +301,21 @@ export class Datafeeds {
     return {
       'name': this.options.symbol,
       'timezone': 'Asia/Shanghai',
-      'pointvalue': 1,
+      'pointvalue': null,
       'fractional': false,
       'session': '24x7',
       'minmov': 1,
-      'minmove2': 1,
+      'minmove2': 0,
       'has_intraday': true,
       'has_no_volume': false,
       'description': this.options.symbol,
       'pricescale': 100,
       'ticker': this.options.symbol,
+      'volume_precision': 2,
+      'intraday_multipliers': ['1', '5', '15', '30', '60'],
+      'has_daily': false,
+      'has_empty_bars': false,
+      'has_weekly_and_monthly': false,
       'supported_resolutions': ['1', '5', '15', '30', '60', '1D', '2D', '3D', '1W', '1M']
     }
   }

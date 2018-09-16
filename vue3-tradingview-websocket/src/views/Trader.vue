@@ -22,9 +22,12 @@ export default {
           container_id: 'trade-view',
           datafeed: new Datafeeds({ symbol: symbol, resolution: interval }),
           library_path: './tradingview/charting_library/',
-          disabled_features: ['header_symbol_search'],
+          disabled_features: ['header_symbol_search', 'volume_force_overlay'],
           timezone: 'Asia/Shanghai',
-          locale: language
+          locale: language,
+          overrides: {
+            "volumePaneSize": "medium"
+          }
         })
         this.widget = widget
       }

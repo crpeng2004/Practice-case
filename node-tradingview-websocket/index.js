@@ -15,7 +15,7 @@ class FetchData {
       const { from, to } = this.period(resolution)
       axios.get(`${this.baseUrl}?symbol=${symbol}&resolution=${resolution}&from=${from}&to=${to}`).then(res => {
         callback && callback(res.data)
-      })
+      }).catch(err => new Error(err))
     }, 1000)
   }
   period(resolution) {
