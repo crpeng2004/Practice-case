@@ -230,9 +230,9 @@ export class Datafeeds {
               bars.push(element)
             }
           }, this)
-          this.HistoricalData = bars
           this.lastTime = bars[bars.length - 1].time
         }
+        this.HistoricalData = bars
         onDataCallback(bars, { noData: false })
       })
     } else {
