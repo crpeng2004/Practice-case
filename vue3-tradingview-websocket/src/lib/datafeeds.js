@@ -81,7 +81,7 @@ export class DataUpdater {
  */
 export class Datafeeds {
   // ws://localhost:666/trader || ws://118.190.201.181:666/trader
-  constructor(options, url = 'ws://127.0.0.1:666/trader') {
+  constructor(options, url = 'ws://118.190.201.181:666/trader') {
     this.url = url
     this.options = options || {}
     this.HistoricalData = null  // 历史数据
