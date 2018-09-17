@@ -111,22 +111,20 @@ export class Datafeeds {
   onMessage(data) {
     if (!data || !data.s) return
     const bars = this.dataProvider(data)
-    if (bars.length > 100 && !this.HistoricalData) {
+    if (!this.HistoricalData) {
       this.HistoricalData = bars
     } else {
-      if (bars.length) {
-        const list = []
-        bars.sort((a, b) => a.time > b.time ? 1 : -1)
-        bars.forEach(function (element) {
-          if (element.time >= this.lastTime && element.time <= Date.now()) {
-            list.push(element)
-          }
-        }, this)
-        if (list.length) {
-          this.PushData = list
-          this.lastTime = list[list.length - 1].time
-          this.barsUpdater.updateData()
+      const list = []
+      bars.sort((a, b) => a.time > b.time ? 1 : -1)
+      bars.forEach(function (element) {
+        if (element.time >= this.lastTime && element.time <= Date.now()) {
+          list.push(element)
         }
+      }, this)
+      if (list.length) {
+        this.PushData = list
+        this.lastTime = list[list.length - 1].time
+        this.barsUpdater.updateData()
       }
     }
   }
